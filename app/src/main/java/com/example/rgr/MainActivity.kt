@@ -10,10 +10,12 @@ import android.widget.RelativeLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import com.example.rgr.databinding.ActivityMainBinding
+import com.example.rgr.db.DbManager
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val myDbManager = DbManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +23,37 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+/*        binding.button.setOnClickListener {
+            saveDb()
+        }*/
+
         setToolbar()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+/*        myDbManager.openDb()
+        val dataList = myDbManager.readDbData()
+        for (item in dataList) {
+            binding.tvText.append(item)
+            binding.tvText.append("\n")
+        }*/
+    }
+
+/*    private fun saveDb() {
+        binding.tvText.text = ""
+        myDbManager.insertToDb(binding.edTitle.text.toString(), binding.edContent.text.toString())
+        val dataList = myDbManager.readDbData()
+        for (item in dataList) {
+            binding.tvText.append(item)
+            binding.tvText.append("\n")
+        }
+    }*/
+
+    override fun onDestroy() {
+        super.onDestroy()
+        myDbManager.closeDb()
     }
 
     private fun setToolbar() {
@@ -50,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             R.id.editNote -> {}
             R.id.deleteNote -> {}
             R.id.move -> {
-                binding.toolbar.setOnTouchListener(CustomTouchListener())
+                //binding.toolbar.setOnTouchListener(CustomTouchListener())
             }
         }
         return super.onOptionsItemSelected(item)
@@ -62,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var xDelta = 0
+/*    private var xDelta = 0
     private var yDelta = 0
 
     private inner class CustomTouchListener : View.OnTouchListener {
@@ -90,5 +122,5 @@ class MainActivity : AppCompatActivity() {
             binding.relativeLayout.invalidate()
             return true
         }
-    }
+    }*/
 }
