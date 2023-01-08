@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/createNote"
+        android:title="@string/create_note"
+        android:icon="@drawable/ic_create"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+    <item
+        android:id="@+id/searchNote"
+        android:title="@string/search_note"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/setColor"
+        android:title="@string/set_color"
+        android:icon="@drawable/ic_set_color"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/editNote"
+        android:title="@string/edit_note"
+        android:icon="@drawable/ic_edit"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/deleteNote"
+        android:title="@string/delete_note"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/move"
+        android:title="@string/move_toolbar"
+        android:icon="@drawable/ic_move"
+        app:showAsAction="always"/>
+
+</menu>
