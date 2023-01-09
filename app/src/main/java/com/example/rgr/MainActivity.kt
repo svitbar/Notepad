@@ -1,5 +1,6 @@
 package com.example.rgr
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -59,10 +60,10 @@ class MainActivity : AppCompatActivity() {
     private fun setToolbar() {
         val toolbar: Toolbar = binding.toolbar
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         binding.toolbar.isVisible = false
 
         showToolbar()
-        title = ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,7 +77,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            R.id.createNote -> {}
+            R.id.createNote -> {
+                val new = Intent(this, EditActivity::class.java)
+                startActivity(new)
+            }
             R.id.searchNote -> {}
             R.id.setColor -> {}
             R.id.editNote -> {}
