@@ -1,23 +1,38 @@
 package com.example.rgr.db
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.rgr.EditActivity
 import com.example.rgr.R
 
-class MyAdapter(list: ArrayList<String>): RecyclerView.Adapter<MyAdapter.MyHolder>() {
+class MyAdapter(list: ArrayList<ListOfNote>, mainActivityContext: Context): RecyclerView.Adapter<MyAdapter.MyHolder>() {
 
     private var arrayList = list
+    private var context = mainActivityContext
 
-    class MyHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    class MyHolder(itemView: View, viewHolderContext: Context): RecyclerView.ViewHolder(itemView) {
 
-        val noteTitle = itemView.findViewById<TextView>(R.id.note)
+        private val noteTitle: TextView = itemView.findViewById(R.id.note)
+        private val context = viewHolderContext
 
-        fun setData(title: String) {
-            noteTitle.text = title
+        fun setData(item: ListOfNote) {
+            noteTitle.text = item.title
+
+            itemView.setOnClickListener {
+
+                val intent = Intent(context, EditActivity::class.java).apply {
+
+                    putExtra(MyIntentConstants.I_TITLE_KEY, item.title)
+                    putExtra(MyIntentConstants.I_DESC_KEY, item.desc)
+                    putExtra(MyIntentConstants.I_URI_KEY, item.uri)
+                }
+                context.startActivity(intent)
+            }
         }
 
     }
@@ -25,18 +40,18 @@ class MyAdapter(list: ArrayList<String>): RecyclerView.Adapter<MyAdapter.MyHolde
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val inflater = LayoutInflater.from(parent.context)
 
-        return MyHolder(inflater.inflate(R.layout.note_template, parent, false))
+        return MyHolder(inflater.inflate(R.layout.note_template, parent, false), context)
     }
 
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
-        holder.setData(arrayList.get(position))
+        holder.setData(arrayList[position])
     }
 
     override fun getItemCount(): Int {
         return arrayList.size
     }
 
-    fun updateAdapter(listItems: List<String>) {
+    fun updateAdapter(listItems: ArrayList<ListOfNote>) {
         arrayList.clear()
         arrayList.addAll(listItems)
 

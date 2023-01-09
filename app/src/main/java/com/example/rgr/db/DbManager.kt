@@ -1,6 +1,7 @@
 package com.example.rgr.db
 
 import android.annotation.SuppressLint
+import android.app.LauncherActivity.ListItem
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -23,8 +24,8 @@ class DbManager(context: Context) {
     }
 
     @SuppressLint("Range")
-    fun readDbData(): ArrayList<String> {
-        val dataList = ArrayList<String>()
+    fun readDbData(): ArrayList<ListOfNote> {
+        val dataList = ArrayList<ListOfNote>()
         val cursor = db?.query(
             DbColName.TABLE_NAME,
             null,
@@ -36,8 +37,17 @@ class DbManager(context: Context) {
 
         with(cursor) {
             while (this?.moveToNext()!!) {
-                val dataText = cursor?.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_TITLE))
-                dataList.add(dataText.toString())
+                val dataTitle = cursor!!.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_TITLE))
+                val dataContent = cursor!!.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_CONTENT))
+                val dataUri = cursor!!.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_IMAGE_URI))
+
+                var item = ListOfNote()
+
+                item.title = dataTitle
+                item.desc = dataContent
+                item.uri = dataUri
+
+                dataList.add(item)
             }
         }
 
