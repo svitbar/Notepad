@@ -7,13 +7,16 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rgr.databinding.ActivityMainBinding
 import com.example.rgr.db.DbManager
+import com.example.rgr.db.MyAdapter
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val myDbManager = DbManager(this)
+    private val myAdapter = MyAdapter(ArrayList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +25,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setToolbar()
+        init()
     }
 
     override fun onResume() {
         super.onResume()
         myDbManager.openDb()
+        fillAdapter()
     }
 
     override fun onDestroy() {
@@ -48,6 +53,15 @@ class MainActivity : AppCompatActivity() {
         binding.showToolbar.setOnClickListener {
             binding.toolbar.isVisible = !binding.toolbar.isVisible
         }
+    }
+
+    private fun init() {
+        binding.recyclerNote.layoutManager = LinearLayoutManager(this)
+        binding.recyclerNote.adapter = myAdapter
+    }
+
+    private fun fillAdapter() {
+        myAdapter.updateAdapter(myDbManager.readDbData())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
