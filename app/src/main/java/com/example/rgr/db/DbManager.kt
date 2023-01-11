@@ -5,6 +5,8 @@ import android.app.LauncherActivity.ListItem
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.provider.BaseColumns
+import java.util.Base64
 
 class DbManager(context: Context) {
     private val myDbHelper = MyDbHelper(context)
@@ -12,6 +14,12 @@ class DbManager(context: Context) {
 
     fun openDb() {
         db = myDbHelper.writableDatabase
+    }
+
+    fun removeItemFromDb(id: String) {
+        var selection = BaseColumns._ID + "=$id"
+
+        db?.delete(DbColName.TABLE_NAME, selection, null )
     }
 
     fun insertToDb(title: String, content: String, uri: String) {
@@ -40,12 +48,14 @@ class DbManager(context: Context) {
                 val dataTitle = cursor!!.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_TITLE))
                 val dataContent = cursor!!.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_CONTENT))
                 val dataUri = cursor!!.getString(cursor.getColumnIndex(DbColName.COLUMN_NAME_IMAGE_URI))
+                val dataId = cursor!!.getInt(cursor.getColumnIndex(BaseColumns._ID))
 
                 var item = ListOfNote()
 
                 item.title = dataTitle
                 item.desc = dataContent
                 item.uri = dataUri
+                item.id = dataId
 
                 dataList.add(item)
             }

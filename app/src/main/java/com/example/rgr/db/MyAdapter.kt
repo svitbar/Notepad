@@ -57,4 +57,12 @@ class MyAdapter(list: ArrayList<ListOfNote>, mainActivityContext: Context): Recy
 
         notifyDataSetChanged()
     }
+
+    fun removeItem(pos: Int, dbManager: DbManager) {
+
+        dbManager.removeItemFromDb(arrayList[pos].id.toString())
+        arrayList.removeAt(pos)
+        notifyItemRangeChanged(0, arrayList.size)
+        notifyItemRemoved(pos)
+    }
 }

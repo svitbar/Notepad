@@ -7,7 +7,9 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.rgr.databinding.ActivityMainBinding
 import com.example.rgr.db.DbManager
 import com.example.rgr.db.MyAdapter
@@ -57,11 +59,32 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         binding.recyclerNote.layoutManager = LinearLayoutManager(this)
+
+        val swapHelper = getSwapManager()
+        swapHelper.attachToRecyclerView(binding.recyclerNote)
+
         binding.recyclerNote.adapter = myAdapter
     }
 
     private fun fillAdapter() {
         myAdapter.updateAdapter(myDbManager.readDbData())
+    }
+
+    private fun getSwapManager(): ItemTouchHelper {
+        return ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                myAdapter.removeItem(viewHolder.adapterPosition, myDbManager)
+            }
+
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
