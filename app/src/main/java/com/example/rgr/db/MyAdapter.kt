@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rgr.EditActivity
 import com.example.rgr.R
 
-class MyAdapter(list: ArrayList<ListOfNote>, mainActivityContext: Context): RecyclerView.Adapter<MyAdapter.MyHolder>() {
+class MyAdapter(list: ArrayList<ListOfNote>,
+                mainActivityContext: Context): RecyclerView.Adapter<MyAdapter.MyHolder>() {
 
     private var arrayList = list
     private var context = mainActivityContext
@@ -30,6 +31,7 @@ class MyAdapter(list: ArrayList<ListOfNote>, mainActivityContext: Context): Recy
                     putExtra(MyIntentConstants.I_TITLE_KEY, item.title)
                     putExtra(MyIntentConstants.I_DESC_KEY, item.desc)
                     putExtra(MyIntentConstants.I_URI_KEY, item.uri)
+                    putExtra(MyIntentConstants.I_ID_KEY, item.id)
                 }
                 context.startActivity(intent)
             }

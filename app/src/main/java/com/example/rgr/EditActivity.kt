@@ -15,7 +15,9 @@ class EditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditBinding
     private val myDbManager = DbManager(this)
     private val imageRequestCode = 10
-    var tempImageUri = "empty"
+    private var id = 0
+    private var tempImageUri = "empty"
+    private var isEditState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,7 @@ class EditActivity : AppCompatActivity() {
         saveData()
         addImage()
         editImage()
+        editFields()
         getMyIntents()
     }
 
@@ -62,9 +65,23 @@ class EditActivity : AppCompatActivity() {
             val myContent = binding.edContent.text.toString()
 
             if (myTitle != "" && myContent != "") {
-                myDbManager.insertToDb(myTitle, myContent, tempImageUri)
+
+                if (isEditState) myDbManager.updateItem(myTitle, myContent, tempImageUri, id)
+                else myDbManager.insertToDb(myTitle, myContent, tempImageUri)
+
                 finish()
             }
+        }
+    }
+
+    private fun editFields() {
+
+        binding.editFields.setOnClickListener {
+            binding.editFields.visibility = View.GONE
+
+            binding.edTitle.isEnabled = true
+            binding.edContent.isEnabled = true
+
         }
     }
 
@@ -78,14 +95,24 @@ class EditActivity : AppCompatActivity() {
 
     private fun getMyIntents() {
 
+        binding.editFields.visibility = View.GONE
+
         val i = intent
 
         if (i != null) {
             if (i.getStringExtra(MyIntentConstants.I_TITLE_KEY) != null) {
+                isEditState = true
+
+                binding.edTitle.isEnabled = false
+                binding.edContent.isEnabled = false
+
                 binding.addImage.visibility = View.GONE
+                binding.editFields.visibility = View.VISIBLE
 
                 binding.edTitle.setText(i.getStringExtra(MyIntentConstants.I_TITLE_KEY))
                 binding.edContent.setText(i.getStringExtra(MyIntentConstants.I_DESC_KEY))
+
+                id = i.getIntExtra(MyIntentConstants.I_ID_KEY, 0)
 
                 if (i.getStringExtra(MyIntentConstants.I_URI_KEY) != "empty") {
                     binding.myImageLayout.visibility = View.VISIBLE

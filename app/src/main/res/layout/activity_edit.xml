@@ -21,6 +21,7 @@
       android:hint="Input title"
       android:inputType="textPersonName"
       android:padding="10dp"
+      android:textColor="@color/edit_text_color_state"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
@@ -37,10 +38,24 @@
       android:hint="Input description"
       android:inputType="textMultiLine|textPersonName"
       android:padding="10dp"
+      android:textColor="@color/edit_text_color_state"
       app:layout_constraintBottom_toTopOf="@+id/myImageLayout"
       app:layout_constraintEnd_toEndOf="@+id/edTitle"
       app:layout_constraintStart_toStartOf="@+id/edTitle"
       app:layout_constraintTop_toBottomOf="@+id/edTitle" />
+
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+      android:id="@+id/editFields"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="8dp"
+      android:clickable="true"
+      app:tint="@color/white"
+      app:backgroundTint="#FA0A5B"
+      app:layout_constraintBottom_toTopOf="@+id/addImage"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:srcCompat="@drawable/ic_edit_note" />
 
   <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/save"
@@ -61,11 +76,11 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="16dp"
-      android:layout_marginBottom="68dp"
+      android:layout_marginBottom="8dp"
       android:background="@color/dark_pink"
       android:clickable="true"
       app:backgroundTint="@color/dark_pink"
-      app:layout_constraintBottom_toBottomOf="@+id/save"
+      app:layout_constraintBottom_toTopOf="@+id/save"
       app:layout_constraintEnd_toEndOf="parent"
       app:srcCompat="@drawable/ic_image"
       app:tint="@color/white" />

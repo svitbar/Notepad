@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         setToolbar()
         init()
+        initSearchView()
     }
 
     override fun onResume() {
@@ -66,8 +68,22 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerNote.adapter = myAdapter
     }
 
+    private fun initSearchView() {
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                myAdapter.updateAdapter(myDbManager.readDbData(newText!!))
+                return true
+            }
+
+        })
+    }
+
     private fun fillAdapter() {
-        myAdapter.updateAdapter(myDbManager.readDbData())
+        myAdapter.updateAdapter(myDbManager.readDbData(""))
     }
 
     private fun getSwapManager(): ItemTouchHelper {
