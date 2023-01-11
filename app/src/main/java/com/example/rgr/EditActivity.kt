@@ -1,5 +1,6 @@
 package com.example.rgr
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,11 @@ import androidx.core.view.isVisible
 import com.example.rgr.databinding.ActivityEditBinding
 import com.example.rgr.db.DbManager
 import com.example.rgr.db.MyIntentConstants
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EditActivity : AppCompatActivity() {
 
@@ -30,6 +36,7 @@ class EditActivity : AppCompatActivity() {
         editImage()
         editFields()
         getMyIntents()
+        deleteImage()
     }
 
     override fun onResume() {
@@ -45,8 +52,8 @@ class EditActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode == RESULT_OK && requestCode == imageRequestCode) {
-            binding.editImage.setImageURI(data?.data)
+        if (resultCode == Activity.RESULT_OK && requestCode == imageRequestCode) {
+            binding.imgView.setImageURI(data?.data)
             tempImageUri = data?.data.toString()
             contentResolver.takePersistableUriPermission(data?.data!!, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -55,7 +62,7 @@ class EditActivity : AppCompatActivity() {
     private fun addImage() {
         binding.addImage.setOnClickListener {
             binding.myImageLayout.isVisible = !binding.myImageLayout.isVisible
-
+            binding.addImage.visibility = View.GONE
         }
     }
 
@@ -66,10 +73,18 @@ class EditActivity : AppCompatActivity() {
 
             if (myTitle != "" && myContent != "") {
 
-                if (isEditState) myDbManager.updateItem(myTitle, myContent, tempImageUri, id)
-                else myDbManager.insertToDb(myTitle, myContent, tempImageUri)
+                CoroutineScope(Dispatchers.Main).launch {
+                    if (isEditState) myDbManager.updateItem(
+                        myTitle,
+                        myContent,
+                        tempImageUri,
+                        id,
+                        getCurrentTime()
+                    )
+                    else myDbManager.insertToDb(myTitle, myContent, tempImageUri, getCurrentTime())
 
-                finish()
+                    finish()
+                }
             }
         }
     }
@@ -77,19 +92,35 @@ class EditActivity : AppCompatActivity() {
     private fun editFields() {
 
         binding.editFields.setOnClickListener {
+
             binding.editFields.visibility = View.GONE
+            binding.addImage.visibility = View.VISIBLE
 
             binding.edTitle.isEnabled = true
             binding.edContent.isEnabled = true
 
+            if (tempImageUri == "empty") return@setOnClickListener
+            binding.editImage.visibility = View.VISIBLE
+            binding.deleteImage.visibility = View.VISIBLE
         }
     }
 
     private fun editImage() {
         binding.editImage.setOnClickListener {
+
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "image/*"
             startActivityForResult(intent, imageRequestCode)
+        }
+    }
+
+    private fun deleteImage() {
+        binding.deleteImage.setOnClickListener {
+
+            binding.myImageLayout.visibility = View.GONE
+            binding.addImage.visibility = View.VISIBLE
+
+            tempImageUri = "empty"
         }
     }
 
@@ -116,11 +147,21 @@ class EditActivity : AppCompatActivity() {
 
                 if (i.getStringExtra(MyIntentConstants.I_URI_KEY) != "empty") {
                     binding.myImageLayout.visibility = View.VISIBLE
-                    binding.editImage.setImageURI(Uri.parse(i.getStringExtra(MyIntentConstants.I_URI_KEY)))
+
+                    tempImageUri = i.getStringExtra(MyIntentConstants.I_URI_KEY)!!
+                    binding.imgView.setImageURI(Uri.parse(tempImageUri))
+
                     binding.editImage.visibility = View.GONE
                     binding.deleteImage.visibility = View.GONE
                 }
             }
         }
+    }
+
+    private fun getCurrentTime(): String {
+        val time = Calendar.getInstance().time
+        val formatter = SimpleDateFormat("dd-MM-yy kk:mm", Locale.getDefault())
+
+        return formatter.format(time)
     }
 }

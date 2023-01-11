@@ -19,10 +19,12 @@ class MyAdapter(list: ArrayList<ListOfNote>,
     class MyHolder(itemView: View, viewHolderContext: Context): RecyclerView.ViewHolder(itemView) {
 
         private val noteTitle: TextView = itemView.findViewById(R.id.note)
+        private val noteTime: TextView = itemView.findViewById(R.id.timeText)
         private val context = viewHolderContext
 
         fun setData(item: ListOfNote) {
             noteTitle.text = item.title
+            noteTime.text = item.time
 
             itemView.setOnClickListener {
 

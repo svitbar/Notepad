@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,12 +15,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rgr.databinding.ActivityMainBinding
 import com.example.rgr.db.DbManager
 import com.example.rgr.db.MyAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val myDbManager = DbManager(this)
     private val myAdapter = MyAdapter(ArrayList(), this)
+    private var job: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         myDbManager.openDb()
-        fillAdapter()
+        fillAdapter("")
     }
 
     override fun onDestroy() {
@@ -75,15 +81,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                myAdapter.updateAdapter(myDbManager.readDbData(newText!!))
+                fillAdapter(newText!!)
+
                 return true
             }
 
         })
     }
 
-    private fun fillAdapter() {
-        myAdapter.updateAdapter(myDbManager.readDbData(""))
+    private fun fillAdapter(text: String) {
+
+        job?.cancel()
+        job = CoroutineScope(Dispatchers.Main).launch {
+            myAdapter.updateAdapter(myDbManager.readDbData(text))
+        }
     }
 
     private fun getSwapManager(): ItemTouchHelper {
@@ -114,7 +125,7 @@ class MainActivity : AppCompatActivity() {
                 val new = Intent(this, EditActivity::class.java)
                 startActivity(new)
             }
-            R.id.searchNote -> {}
+            R.id.searchNote -> binding.searchView.isGone = !binding.searchView.isGone
             R.id.setColor -> {}
             R.id.editNote -> {}
             R.id.deleteNote -> {}
