@@ -15,24 +15,14 @@
         android:icon="@drawable/ic_search"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/setColor"
-        android:title="@string/set_color"
-        android:icon="@drawable/ic_set_color"
-        app:showAsAction="always"/>
-    <item
-        android:id="@+id/editNote"
-        android:title="@string/edit_note"
-        android:icon="@drawable/ic_edit"
-        app:showAsAction="always"/>
-    <item
-        android:id="@+id/deleteNote"
-        android:title="@string/delete_note"
-        android:icon="@drawable/ic_delete"
-        app:showAsAction="always"/>
-    <item
         android:id="@+id/move"
         android:title="@string/move_toolbar"
         android:icon="@drawable/ic_move"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/exit"
+        android:title="exit"
+        android:icon="@drawable/ic_exit"
         app:showAsAction="always"/>
 
 </menu>

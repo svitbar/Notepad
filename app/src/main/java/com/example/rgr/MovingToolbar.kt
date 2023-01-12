@@ -1,36 +1,39 @@
 package com.example.rgr
 
-import android.content.Context
+import android.annotation.SuppressLint
+import android.view.MotionEvent
 import android.view.View
 
-class MovingToolbar {
-    /*    private var xDelta = 0
-    private var yDelta = 0
+class MovingToolbar(private var viewItem: View) {
 
-    private inner class CustomTouchListener : View.OnTouchListener {
-        override fun onTouch(v: View, event: MotionEvent): Boolean {
-            val x = event.rawX.toInt()
-            val y = event.rawY.toInt()
-            when (event.action and MotionEvent.ACTION_MASK) {
-                MotionEvent.ACTION_DOWN -> {
-                    val lParams = v.layoutParams as RelativeLayout.LayoutParams
-                    xDelta = x - lParams.leftMargin
-                    yDelta = y - lParams.topMargin
+    private var rightDX = 0f
+    private var rightDY  = 0f
+
+    @SuppressLint("ClickableViewAccessibility")
+    fun moveItem(state: Boolean) {
+        viewItem.setOnTouchListener(View.OnTouchListener { view, event ->
+            if (state){
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+
+                        rightDX = view!!.x - event.rawX
+                        rightDY = view.y - event.rawY
+
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+
+                        val displacement = event.rawX + rightDX
+
+                        view!!.animate()
+                            .x(displacement)
+                            .y(event.rawY + rightDY)
+                            .setDuration(0)
+                            .start()
+                    }
                 }
-                MotionEvent.ACTION_UP -> {}
-                MotionEvent.ACTION_POINTER_DOWN -> {}
-                MotionEvent.ACTION_POINTER_UP -> {}
-                MotionEvent.ACTION_MOVE -> {
-                    val layoutParams = v.layoutParams as RelativeLayout.LayoutParams
-                    layoutParams.leftMargin = x - xDelta
-                    layoutParams.topMargin = y - yDelta
-                    layoutParams.rightMargin = 0
-                    layoutParams.bottomMargin = 0
-                    v.layoutParams = layoutParams
-                }
+                return@OnTouchListener true
             }
-            binding.relativeLayout.invalidate()
-            return true
-        }
-    }*/
+            true
+        })
+    }
 }

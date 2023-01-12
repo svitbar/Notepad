@@ -1,12 +1,14 @@
 package com.example.rgr
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -25,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val myDbManager = DbManager(this)
     private val myAdapter = MyAdapter(ArrayList(), this)
+    private lateinit var movingToolbar: MovingToolbar
     private var job: Job? = null
+    private var isChecked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         setToolbar()
         init()
         initSearchView()
+        movingToolbar = MovingToolbar(binding.toolbar)
     }
 
     override fun onResume() {
@@ -126,12 +131,17 @@ class MainActivity : AppCompatActivity() {
                 startActivity(new)
             }
             R.id.searchNote -> binding.searchView.isGone = !binding.searchView.isGone
-            R.id.setColor -> {}
-            R.id.editNote -> {}
-            R.id.deleteNote -> {}
             R.id.move -> {
-                //binding.toolbar.setOnTouchListener(CustomTouchListener())
+                isChecked = !isChecked
+
+                val colorState = ResourcesCompat.getColor(resources, R.color.hint_color, null)
+
+                if(isChecked) item.icon.setTint(colorState)
+                else item.icon.setTint(Color.WHITE)
+
+                movingToolbar.moveItem(isChecked)
             }
+            R.id.exit -> finish()
         }
         return super.onOptionsItemSelected(item)
     }
