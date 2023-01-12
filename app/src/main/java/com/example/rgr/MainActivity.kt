@@ -125,16 +125,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val colorState = ResourcesCompat.getColor(resources, R.color.hint_color, null)
+
         when(item.itemId) {
             R.id.createNote -> {
                 val new = Intent(this, EditActivity::class.java)
                 startActivity(new)
             }
-            R.id.searchNote -> binding.searchView.isGone = !binding.searchView.isGone
+            R.id.searchNote -> {
+                binding.searchView.isGone = !binding.searchView.isGone
+
+                if(!binding.searchView.isGone) item.icon.setTint(colorState)
+                else item.icon.setTint(Color.WHITE)
+            }
             R.id.move -> {
                 isChecked = !isChecked
-
-                val colorState = ResourcesCompat.getColor(resources, R.color.hint_color, null)
 
                 if(isChecked) item.icon.setTint(colorState)
                 else item.icon.setTint(Color.WHITE)

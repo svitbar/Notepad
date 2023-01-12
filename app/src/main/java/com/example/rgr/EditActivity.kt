@@ -62,6 +62,7 @@ class EditActivity : AppCompatActivity() {
     private fun addImage() {
         binding.addImage.setOnClickListener {
             binding.myImageLayout.isVisible = !binding.myImageLayout.isVisible
+            binding.addImage.isVisible = !binding.addImage.isVisible
         }
     }
 

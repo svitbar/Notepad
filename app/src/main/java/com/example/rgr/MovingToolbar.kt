@@ -22,10 +22,8 @@ class MovingToolbar(private var viewItem: View) {
                     }
                     MotionEvent.ACTION_MOVE -> {
 
-                        val displacement = event.rawX + rightDX
-
                         view!!.animate()
-                            .x(displacement)
+                            .x(event.rawX + rightDX)
                             .y(event.rawY + rightDY)
                             .setDuration(0)
                             .start()
