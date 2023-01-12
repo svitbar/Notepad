@@ -1,19 +1,35 @@
 package com.example.rgr
 
+import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
-import android.widget.RelativeLayout
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.rgr.databinding.ActivityMainBinding
+import com.example.rgr.db.DbManager
+import com.example.rgr.db.MyAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val myDbManager = DbManager(this)
+    private val myAdapter = MyAdapter(ArrayList(), this)
+    private lateinit var movingToolbar: MovingToolbar
+    private var job: Job? = null
+    private var isChecked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,38 +38,30 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setToolbar()
+        init()
+        initSearchView()
+        movingToolbar = MovingToolbar(binding.toolbar)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        myDbManager.openDb()
+        fillAdapter("")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        myDbManager.closeDb()
     }
 
     private fun setToolbar() {
         val toolbar: Toolbar = binding.toolbar
+
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         binding.toolbar.isVisible = false
 
         showToolbar()
-        title = ""
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.createNote -> {}
-            R.id.searchNote -> {}
-            R.id.setColor -> {}
-            R.id.editNote -> {}
-            R.id.deleteNote -> {}
-            R.id.move -> {
-                binding.toolbar.setOnTouchListener(CustomTouchListener())
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun showToolbar() {
@@ -62,33 +70,84 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var xDelta = 0
-    private var yDelta = 0
+    private fun init() {
+        binding.recyclerNote.layoutManager = LinearLayoutManager(this)
 
-    private inner class CustomTouchListener : View.OnTouchListener {
-        override fun onTouch(v: View, event: MotionEvent): Boolean {
-            val x = event.rawX.toInt()
-            val y = event.rawY.toInt()
-            when (event.action and MotionEvent.ACTION_MASK) {
-                MotionEvent.ACTION_DOWN -> {
-                    val lParams = v.layoutParams as RelativeLayout.LayoutParams
-                    xDelta = x - lParams.leftMargin
-                    yDelta = y - lParams.topMargin
-                }
-                MotionEvent.ACTION_UP -> {}
-                MotionEvent.ACTION_POINTER_DOWN -> {}
-                MotionEvent.ACTION_POINTER_UP -> {}
-                MotionEvent.ACTION_MOVE -> {
-                    val layoutParams = v.layoutParams as RelativeLayout.LayoutParams
-                    layoutParams.leftMargin = x - xDelta
-                    layoutParams.topMargin = y - yDelta
-                    layoutParams.rightMargin = 0
-                    layoutParams.bottomMargin = 0
-                    v.layoutParams = layoutParams
-                }
+        val swapHelper = getSwapManager()
+        swapHelper.attachToRecyclerView(binding.recyclerNote)
+
+        binding.recyclerNote.adapter = myAdapter
+    }
+
+    private fun initSearchView() {
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
             }
-            binding.relativeLayout.invalidate()
-            return true
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                fillAdapter(newText!!)
+
+                return true
+            }
+
+        })
+    }
+
+    private fun fillAdapter(text: String) {
+
+        job?.cancel()
+        job = CoroutineScope(Dispatchers.Main).launch {
+            myAdapter.updateAdapter(myDbManager.readDbData(text))
         }
+    }
+
+    private fun getSwapManager(): ItemTouchHelper {
+        return ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                myAdapter.removeItem(viewHolder.adapterPosition, myDbManager)
+            }
+
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val colorState = ResourcesCompat.getColor(resources, R.color.hint_color, null)
+
+        when(item.itemId) {
+            R.id.createNote -> {
+                val new = Intent(this, EditActivity::class.java)
+                startActivity(new)
+            }
+            R.id.searchNote -> {
+                binding.searchView.isGone = !binding.searchView.isGone
+
+                if(!binding.searchView.isGone) item.icon.setTint(colorState)
+                else item.icon.setTint(Color.WHITE)
+            }
+            R.id.move -> {
+                isChecked = !isChecked
+
+                if(isChecked) item.icon.setTint(colorState)
+                else item.icon.setTint(Color.WHITE)
+
+                movingToolbar.moveItem(isChecked)
+            }
+            R.id.exit -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
